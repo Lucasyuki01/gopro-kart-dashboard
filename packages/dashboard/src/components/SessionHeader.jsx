@@ -1,3 +1,5 @@
+import { exportPdf } from '../exportPdf'
+
 export default function SessionHeader({ session }) {
   const { meta, summary } = session
   const date = meta.extractedAt
@@ -18,6 +20,9 @@ export default function SessionHeader({ session }) {
         <span>•</span>
         <span>{summary.totalLaps} laps</span>
       </div>
+      <button className="export-btn" onClick={() => exportPdf(session)}>
+        Export PDF
+      </button>
     </div>
   )
 }
