@@ -5,6 +5,7 @@ import SectorPanel from './SectorPanel'
 import SpeedChart from './SpeedChart'
 import TrackMap from './TrackMap'
 import StatsBar from './StatsBar'
+import LapTimesChart from './LapTimesChart'
 import '../styles/dashboard.css'
 
 export default function Dashboard() {
@@ -67,6 +68,12 @@ export default function Dashboard() {
           <TrackMap
             fullTrack={session.fullTrack}
             selectedLap={selectedLap}
+          />
+          <LapTimesChart
+            laps={session.laps}
+            bestLapNumber={session.summary.bestLapNumber}
+            selectedLap={selectedLap}
+            onSelectLap={setSelectedLap}
           />
           <SpeedChart lap={selectedLap} referenceLap={referenceLap} />
           <SectorPanel
