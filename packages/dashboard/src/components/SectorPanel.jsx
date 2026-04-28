@@ -5,7 +5,7 @@ export default function SectorPanel({ lap, bestSectors }) {
 
   return (
     <div className="panel">
-      <div className="panel-title">Setores — V{lap.lapNumber}</div>
+      <div className="panel-title">Sectors — L{lap.lapNumber}</div>
       <div className="sectors-grid">
         {lap.sectors.map((sector, i) => {
           const best = bestTimes[i]
@@ -13,12 +13,12 @@ export default function SectorPanel({ lap, bestSectors }) {
           const isBest = delta === 0
           const pct = best > 0 ? Math.max(10, 100 - ((delta / best) * 100 * 8)) : 100
           const deltaStr = isBest
-            ? '— MELHOR SETOR'
+            ? '— BEST SECTOR'
             : `+${(delta / 1000).toFixed(3)}s`
 
           return (
             <div className="sector-card" key={sector.sector}>
-              <div className="sector-label">Setor {sector.sector}</div>
+              <div className="sector-label">Sector {sector.sector}</div>
               <div className="sector-time">{sector.sectorTime}</div>
               <div className={`sector-delta ${isBest ? 'best' : 'slow'}`}>
                 {deltaStr}
@@ -30,7 +30,7 @@ export default function SectorPanel({ lap, bestSectors }) {
                 />
               </div>
               <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text2)', fontFamily: 'var(--mono)' }}>
-                máx {sector.maxSpeedKmh} km/h
+                max {sector.maxSpeedKmh} km/h
               </div>
             </div>
           )

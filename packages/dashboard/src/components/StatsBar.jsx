@@ -7,35 +7,35 @@ export default function StatsBar({ summary }) {
   return (
     <div className="stats-bar">
       <div className="stat-card">
-        <span className="stat-label">Melhor Volta</span>
+        <span className="stat-label">Best Lap</span>
         <span className="stat-value green">{summary.bestLapTime}</span>
-        <span className="stat-sub">V{summary.bestLapNumber}</span>
+        <span className="stat-sub">L{summary.bestLapNumber}</span>
       </div>
 
       <div className="stat-card">
-        <span className="stat-label">Total de Voltas</span>
+        <span className="stat-label">Total Laps</span>
         <span className="stat-value blue">{summary.totalLaps}</span>
-        <span className="stat-sub">voltas completadas</span>
+        <span className="stat-sub">laps completed</span>
       </div>
 
       <div className="stat-card">
-        <span className="stat-label">Velocidade Máx</span>
+        <span className="stat-label">Max Speed</span>
         <span className="stat-value red">
           {summary.sessionMaxSpeedKmh}<span className="stat-unit">km/h</span>
         </span>
-        <span className="stat-sub">pico da sessão</span>
+        <span className="stat-sub">session peak</span>
       </div>
 
       <div className="stat-card">
-        <span className="stat-label">Velocidade Média</span>
+        <span className="stat-label">Avg Speed</span>
         <span className="stat-value">
           {summary.sessionAvgSpeedKmh}<span className="stat-unit">km/h</span>
         </span>
-        <span className="stat-sub">durante a corrida</span>
+        <span className="stat-sub">during the race</span>
       </div>
 
       <div className="stat-card">
-        <span className="stat-label">Força G Máx</span>
+        <span className="stat-label">Max G-Force</span>
         <span className="stat-value amber">
           {summary.sessionMaxGLateral}<span className="stat-unit">G</span>
         </span>
@@ -43,9 +43,9 @@ export default function StatsBar({ summary }) {
       </div>
 
       <div className="stat-card">
-        <span className="stat-label">Tamanho da Pista</span>
+        <span className="stat-label">Track Length</span>
         <span className="stat-value">{trackDisplay}</span>
-        <span className="stat-sub">estimativa por GPS</span>
+        <span className="stat-sub">GPS estimate</span>
       </div>
     </div>
   )

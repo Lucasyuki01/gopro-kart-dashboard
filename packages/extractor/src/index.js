@@ -7,13 +7,13 @@ import goproTelemetry from 'gopro-telemetry';
 
 program
   .name('kart-extractor')
-  .description('Extrai telemetria GPMF de vídeos GoPro Hero 10')
-  .option('-f, --file <path>', 'Caminho para um único arquivo .mp4')
-  .option('-m, --multi <paths...>', 'Múltiplos arquivos .mp4 em ordem')
-  .option('-o, --output <path>', 'Pasta de saída', './output')
-  .option('--name <name>', 'Nome do arquivo de saída (sem extensão)')
-  .option('--streams <streams>', 'Streams a extrair: GPS5,ACCL,GYRO', 'GPS5,ACCL,GYRO')
-  .option('--smooth <n>', 'Suavização de dados GPS (0 = desligado)', '1')
+  .description('Extract GPMF telemetry from GoPro Hero 10 videos')
+  .option('-f, --file <path>', 'Path to a single .mp4 file')
+  .option('-m, --multi <paths...>', 'Multiple .mp4 files in order')
+  .option('-o, --output <path>', 'Output directory', './output')
+  .option('--name <name>', 'Output filename (without extension)')
+  .option('--streams <streams>', 'Streams to extract: GPS5,ACCL,GYRO', 'GPS5,ACCL,GYRO')
+  .option('--smooth <n>', 'GPS data smoothing (0 = disabled)', '1')
   .parse(process.argv);
 
 const opts = program.opts();
@@ -28,16 +28,16 @@ function formatBytes(bytes) {
   return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
 }
 
-// Chunk size baseado no tamanho do arquivo — arquivos maiores precisam de chunks maiores
+// Chunk size based on file size — larger files need bigger chunks
 function getChunkSize(filePath) {
   const sizeBytes = statSync(filePath).size;
   const sizeGiB = sizeBytes / (1024 ** 3);
-  if (sizeGiB > 3) return 30 * 1024 * 1024;  // 30MB chunks para >3GB
-  if (sizeGiB > 1) return 15 * 1024 * 1024;  // 15MB chunks para >1GB
-  return 5 * 1024 * 1024;                      // 5MB chunks para o resto
+  if (sizeGiB > 3) return 30 * 1024 * 1024;  // 30MB chunks for >3GB
+  if (sizeGiB > 1) return 15 * 1024 * 1024;  // 15MB chunks for >1GB
+  return 5 * 1024 * 1024;                      // 5MB chunks for the rest
 }
 
-// Leitura por stream para arquivos grandes — evita o limite de 2GB do mp4box
+// Stream-based reading for large files — avoids the mp4box 2 GB limit
 function bufferAppender(filePath, chunkSize) {
   return function (mp4boxFile) {
     const stream = createReadStream(filePath, { highWaterMark: chunkSize });
@@ -57,15 +57,15 @@ function bufferAppender(filePath, chunkSize) {
 async function extractOne(filePath) {
   const sizeBytes = statSync(filePath).size;
   const chunkSize = getChunkSize(filePath);
-  log(`Lendo: ${basename(filePath)} (${formatBytes(sizeBytes)}) — chunks de ${formatBytes(chunkSize)}`);
+  log(`Reading: ${basename(filePath)} (${formatBytes(sizeBytes)}) — chunks of ${formatBytes(chunkSize)}`);
 
   const rawData = await gpmfExtract(bufferAppender(filePath, chunkSize));
 
   if (!rawData || !rawData.rawData?.length) {
-    throw new Error(`Nenhum dado GPMF encontrado em ${basename(filePath)}`);
+    throw new Error(`No GPMF data found in ${basename(filePath)}`);
   }
 
-  log(`  GPMF extraído: ${formatBytes(rawData.rawData.length)}`);
+  log(`  GPMF extracted: ${formatBytes(rawData.rawData.length)}`);
   return rawData;
 }
 
@@ -80,23 +80,23 @@ async function extract() {
   } else if (opts.file) {
     files = [resolve(opts.file)];
   } else {
-    console.error('Erro: informe --file ou --multi');
+    console.error('Error: provide --file or --multi');
     process.exit(1);
   }
 
   for (const f of files) {
     if (!existsSync(f)) {
-      console.error(`Erro: arquivo não encontrado: ${f}`);
+      console.error(`Error: file not found: ${f}`);
       process.exit(1);
     }
     if (extname(f).toLowerCase() !== '.mp4') {
-      console.error(`Erro: ${f} não é um .mp4`);
+      console.error(`Error: ${f} is not a .mp4 file`);
       process.exit(1);
     }
   }
 
-  log(`${files.length} arquivo(s) para processar`);
-  log('Extraindo faixas GPMF...');
+  log(`${files.length} file(s) to process`);
+  log('Extracting GPMF tracks...');
 
   const extracted = [];
   for (const f of files) {
@@ -104,12 +104,12 @@ async function extract() {
       const raw = await extractOne(f);
       extracted.push(raw);
     } catch (err) {
-      console.error(`Erro ao processar ${basename(f)}: ${err.message}`);
+      console.error(`Error processing ${basename(f)}: ${err.message}`);
       process.exit(1);
     }
   }
 
-  log(`Convertendo streams: ${streams.join(', ')}...`);
+  log(`Converting streams: ${streams.join(', ')}...`);
   const input = extracted.length === 1 ? extracted[0] : extracted;
   const telemetry = await goproTelemetry(input, {
     stream: streams,
@@ -120,21 +120,21 @@ async function extract() {
 
   const deviceKey = Object.keys(telemetry)[0];
   if (!deviceKey) {
-    console.error('Nenhum stream de telemetria retornado.');
+    console.error('No telemetry stream returned.');
     process.exit(1);
   }
 
   const device = telemetry[deviceKey];
   const availableStreams = Object.keys(device.streams || {});
-  log(`Streams disponíveis: ${availableStreams.join(', ')}`);
+  log(`Available streams: ${availableStreams.join(', ')}`);
 
   const gpsSamples = device.streams?.GPS5?.samples || [];
   const acclSamples = device.streams?.ACCL?.samples || [];
   const gyroSamples = device.streams?.GYRO?.samples || [];
 
-  log(`GPS: ${gpsSamples.length} amostras`);
-  log(`Acelerômetro: ${acclSamples.length} amostras`);
-  log(`Giroscópio: ${gyroSamples.length} amostras`);
+  log(`GPS: ${gpsSamples.length} samples`);
+  log(`Accelerometer: ${acclSamples.length} samples`);
+  log(`Gyroscope: ${gyroSamples.length} samples`);
 
   const speeds = gpsSamples.map(s => s.value?.[4] ?? 0).filter(v => v > 0);
   const maxSpeed = speeds.length ? Math.max(...speeds) : 0;
@@ -189,21 +189,21 @@ async function extract() {
 
   log('');
   log('─────────────────────────────────────────');
-  log('Extração concluída com sucesso!');
-  log(`Arquivo gerado: ${outputFile}`);
+  log('Extraction completed successfully!');
+  log(`Output file: ${outputFile}`);
   log('');
-  log(`  Câmera:          ${output.meta.camera}`);
-  log(`  Arquivos merged: ${files.length}`);
-  log(`  Amostras GPS:    ${output.meta.stats.gpsSamples}`);
-  log(`  Velocidade máx:  ${output.meta.stats.maxSpeedKmh} km/h`);
-  log(`  Velocidade méd:  ${output.meta.stats.avgSpeedKmh} km/h`);
+  log(`  Camera:          ${output.meta.camera}`);
+  log(`  Merged files:    ${files.length}`);
+  log(`  GPS samples:     ${output.meta.stats.gpsSamples}`);
+  log(`  Max speed:       ${output.meta.stats.maxSpeedKmh} km/h`);
+  log(`  Avg speed:       ${output.meta.stats.avgSpeedKmh} km/h`);
   log('─────────────────────────────────────────');
   log('');
-  log('Próximo passo:');
+  log('Next step:');
   log(`  node packages/analyzer/src/index.js -f ${outputFile}`);
 }
 
 extract().catch(err => {
-  console.error('[extractor] Erro inesperado:', err);
+  console.error('[extractor] Unexpected error:', err);
   process.exit(1);
 });

@@ -87,5 +87,4 @@ npm run preview   # preview production build
 
 - **No TypeScript** — plain JavaScript throughout all three packages
 - **Static dashboard** — `session.json` must be copied manually; there is no server or auto-reload from `output/`
-- **Portuguese UI text** — all visible labels/strings in the dashboard are in Portuguese; keep new UI text in Portuguese
 - **Large file handling** — extractor streams MP4 files; avoid loading entire files into memory

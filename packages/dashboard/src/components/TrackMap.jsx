@@ -35,7 +35,7 @@ export default function TrackMap({ fullTrack, selectedLap }) {
   useEffect(() => {
     if (!mapInstanceRef.current || !fullTrack?.length) return
 
-    // Remove camadas anteriores
+    // Remove previous layers
     layersRef.current.forEach(l => l.remove())
     layersRef.current = []
 
@@ -44,7 +44,7 @@ export default function TrackMap({ fullTrack, selectedLap }) {
     const minSpeed = Math.min(...speeds)
     const maxSpeed = Math.max(...speeds)
 
-    // Desenha segmentos coloridos por velocidade
+    // Draw speed-colored segments
     for (let i = 1; i < track.length; i++) {
       const a = track[i - 1]
       const b = track[i]
@@ -59,7 +59,7 @@ export default function TrackMap({ fullTrack, selectedLap }) {
       layersRef.current.push(line)
     }
 
-    // Marca ponto de largada
+    // Mark start point
     if (track.length > 0) {
       const start = track[0]
       const marker = L.circleMarker([start.lat, start.lng], {
@@ -68,11 +68,11 @@ export default function TrackMap({ fullTrack, selectedLap }) {
         fillColor: '#00e87a',
         fillOpacity: 1,
         weight: 2,
-      }).bindTooltip('Largada', { permanent: false }).addTo(mapInstanceRef.current)
+      }).bindTooltip('Start', { permanent: false }).addTo(mapInstanceRef.current)
       layersRef.current.push(marker)
     }
 
-    // Centraliza o mapa no traçado
+    // Fit map to track bounds
     const bounds = L.latLngBounds(
       track.filter(p => p.lat != null).map(p => [p.lat, p.lng])
     )
@@ -82,9 +82,9 @@ export default function TrackMap({ fullTrack, selectedLap }) {
   return (
     <div className="panel">
       <div className="panel-title">
-        Mapa — {selectedLap ? `V${selectedLap.lapNumber}` : 'Traçado completo'}
+        Map — {selectedLap ? `L${selectedLap.lapNumber}` : 'Full track'}
         <span style={{ marginLeft: 12, fontSize: 10, color: 'var(--text2)' }}>
-          🟢 lento → 🔴 rápido
+          🟢 slow → 🔴 fast
         </span>
       </div>
       <div className="map-wrapper" ref={mapRef} />

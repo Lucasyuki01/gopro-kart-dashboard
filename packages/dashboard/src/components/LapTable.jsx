@@ -5,10 +5,10 @@ export default function LapTable({ laps, bestLapNumber, selectedLap, referenceLa
   return (
     <div className="panel">
       <div className="panel-title">
-        Voltas
+        Laps
         {referenceLap && (
           <span style={{ marginLeft: 12, color: 'var(--blue)', fontSize: 10 }}>
-            REF: V{referenceLap.lapNumber}
+            REF: L{referenceLap.lapNumber}
           </span>
         )}
       </div>
@@ -16,8 +16,8 @@ export default function LapTable({ laps, bestLapNumber, selectedLap, referenceLa
         <thead>
           <tr>
             <th>#</th>
-            <th>Tempo</th>
-            <th>Máx km/h</th>
+            <th>Time</th>
+            <th>Max km/h</th>
             <th></th>
             <th>Ref</th>
           </tr>
@@ -41,7 +41,7 @@ export default function LapTable({ laps, bestLapNumber, selectedLap, referenceLa
                 ].join(' ')}
                 onClick={() => onSelectLap(lap)}
               >
-                <td>V{lap.lapNumber}</td>
+                <td>L{lap.lapNumber}</td>
                 <td>
                   {lap.lapTime}
                   {deltaStr && (
@@ -59,7 +59,7 @@ export default function LapTable({ laps, bestLapNumber, selectedLap, referenceLa
                   <button
                     className={`ref-btn ${isReference ? 'ref-btn-active' : ''}`}
                     onClick={e => { e.stopPropagation(); onSetReference(lap) }}
-                    title={isReference ? 'Remover referência' : 'Usar como referência'}
+                    title={isReference ? 'Remove reference' : 'Set as reference'}
                   >
                     {isReference ? '★' : '☆'}
                   </button>

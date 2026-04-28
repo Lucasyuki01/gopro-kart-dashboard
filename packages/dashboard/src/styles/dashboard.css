@@ -294,7 +294,7 @@ body {
   background: var(--bg);
 }
 
-/* REFERÊNCIA DE VOLTA */
+/* LAP REFERENCE */
 .lap-table tr.reference td { background: #4488ff11; }
 
 .ref-btn {

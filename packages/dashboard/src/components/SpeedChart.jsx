@@ -14,7 +14,7 @@ export default function SpeedChart({ lap, referenceLap }) {
     ?.filter(p => p.speedKmh != null)
     .map((p, i) => ({ i, ref: parseFloat(p.speedKmh.toFixed(1)) }))
 
-  // Merge das duas séries pelo índice
+  // Merge both series by index
   const maxLen = Math.max(lapData.length, refData?.length ?? 0)
   const data = Array.from({ length: maxLen }, (_, i) => ({
     i,
@@ -23,8 +23,8 @@ export default function SpeedChart({ lap, referenceLap }) {
   }))
 
   const title = referenceLap
-    ? `Velocidade — V${lap.lapNumber} vs V${referenceLap.lapNumber}`
-    : `Velocidade — V${lap.lapNumber}`
+    ? `Speed — L${lap.lapNumber} vs L${referenceLap.lapNumber}`
+    : `Speed — L${lap.lapNumber}`
 
   return (
     <div className="panel">
@@ -51,7 +51,7 @@ export default function SpeedChart({ lap, referenceLap }) {
               }}
               formatter={(v, name) => [
                 `${v} km/h`,
-                name === 'speed' ? `V${lap.lapNumber}` : `V${referenceLap?.lapNumber} (ref)`
+                name === 'speed' ? `L${lap.lapNumber}` : `L${referenceLap?.lapNumber} (ref)`
               ]}
               labelFormatter={() => ''}
             />

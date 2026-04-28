@@ -17,7 +17,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetch('/session.json')
       .then(r => {
-        if (!r.ok) throw new Error('Arquivo session.json não encontrado em public/')
+        if (!r.ok) throw new Error('session.json file not found in public/')
         return r.json()
       })
       .then(data => {
@@ -34,15 +34,15 @@ export default function Dashboard() {
   if (loading) return (
     <div className="loading-screen">
       <div className="loading-spinner" />
-      <p>Carregando telemetria...</p>
+      <p>Loading telemetry...</p>
     </div>
   )
 
   if (error) return (
     <div className="error-screen">
-      <h2>Erro ao carregar sessão</h2>
+      <h2>Error loading session</h2>
       <p>{error}</p>
-      <code>Copie o arquivo session.json para packages/dashboard/public/session.json</code>
+      <code>Copy session.json to packages/dashboard/public/session.json</code>
     </div>
   )
 
