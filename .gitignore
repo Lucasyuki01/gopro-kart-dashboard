@@ -1,0 +1,17 @@
+# Dependências
+node_modules/
+
+# Dados brutos — arquivos grandes demais para o git
+input/
+output/
+
+# Vite
+packages/dashboard/dist/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local

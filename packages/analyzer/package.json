@@ -1,0 +1,12 @@
+{
+  "name": "@kart/analyzer",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "analyze": "node src/index.js"
+  },
+  "dependencies": {
+    "@turf/turf": "^6.5.0",
+    "commander": "^12.0.0"
+  }
+}

@@ -1,0 +1,318 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --text2: #8888aa;
+  --green: #00e87a;
+  --green-dim: #00e87a22;
+  --red: #ff4455;
+  --amber: #ffaa00;
+  --blue: #4488ff;
+  --mono: 'Share Tech Mono', monospace;
+  --display: 'Rajdhani', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--display);
+  min-height: 100vh;
+}
+
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* LOADING / ERROR */
+.loading-screen, .error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+  font-family: var(--display);
+  color: var(--text2);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-screen h2 { color: var(--red); font-size: 24px; }
+.error-screen code {
+  background: var(--bg3);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--amber);
+}
+
+/* HEADER */
+.session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  border-left: 4px solid var(--green);
+}
+
+.session-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.session-header h1 span { color: var(--green); }
+
+.session-meta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--mono);
+}
+
+/* STATS BAR */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--green); }
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-value.green { color: var(--green); }
+.stat-value.amber { color: var(--amber); }
+.stat-value.red { color: var(--red); }
+.stat-value.blue { color: var(--blue); }
+
+.stat-unit {
+  font-size: 12px;
+  color: var(--text2);
+  margin-left: 2px;
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+/* GRID */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.col-left, .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* PANEL BASE */
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.panel-title {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* LAP TABLE */
+.lap-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lap-table th {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.lap-table td {
+  padding: 9px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  border-bottom: 1px solid var(--border)55;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lap-table tr:last-child td { border-bottom: none; }
+.lap-table tr:hover td { background: var(--bg3); }
+.lap-table tr.selected td { background: var(--green-dim); }
+.lap-table tr.best-lap td { color: var(--green); }
+
+.badge {
+  display: inline-block;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.badge-best { background: #00e87a22; color: var(--green); border: 1px solid var(--green)44; }
+.badge-slow { background: #ff445522; color: var(--red); border: 1px solid var(--red)44; }
+
+/* SECTOR PANEL */
+.sectors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.sector-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.sector-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.sector-time {
+  font-family: var(--mono);
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.sector-delta {
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.sector-delta.best { color: var(--green); }
+.sector-delta.slow { color: var(--red); }
+
+.sector-bar-bg {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.sector-bar-fill {
+  height: 3px;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.bar-best { background: var(--green); }
+.bar-slow { background: var(--red); }
+.bar-mid { background: var(--amber); }
+
+/* SPEED CHART */
+.chart-wrapper {
+  padding: 16px;
+  height: 200px;
+}
+
+/* MAP */
+.map-wrapper {
+  height: 420px;
+}
+
+.map-wrapper .leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0 0 12px 12px;
+  background: var(--bg);
+}
+
+/* REFERÊNCIA DE VOLTA */
+.lap-table tr.reference td { background: #4488ff11; }
+
+.ref-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.ref-btn:hover { color: var(--blue); }
+.ref-btn.ref-btn-active { color: var(--blue); }
+
+/* STATS BAR — 6 cards */
+.stats-bar {
+  grid-template-columns: repeat(6, 1fr);
+}
