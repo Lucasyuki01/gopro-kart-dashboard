@@ -68,6 +68,7 @@ export default function Dashboard() {
           <TrackMap
             fullTrack={session.fullTrack}
             selectedLap={selectedLap}
+            referenceLap={referenceLap}
           />
           <LapTimesChart
             laps={session.laps}

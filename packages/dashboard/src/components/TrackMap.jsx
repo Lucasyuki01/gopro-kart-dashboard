@@ -13,7 +13,35 @@ function speedToColor(speed, minSpeed, maxSpeed) {
   }
 }
 
-export default function TrackMap({ fullTrack, selectedLap }) {
+function drawSpeedTrack(map, track, layers, weight = 4, opacity = 0.9) {
+  const speeds = track.map(p => p.speedKmh ?? 0)
+  const minSpeed = Math.min(...speeds)
+  const maxSpeed = Math.max(...speeds)
+
+  for (let i = 1; i < track.length; i++) {
+    const a = track[i - 1]
+    const b = track[i]
+    if (a.lat == null || b.lat == null) continue
+
+    const color = speedToColor(a.speedKmh ?? 0, minSpeed, maxSpeed)
+    const line = L.polyline(
+      [[a.lat, a.lng], [b.lat, b.lng]],
+      { color, weight, opacity }
+    ).addTo(map)
+    layers.push(line)
+  }
+}
+
+function drawSolidTrack(map, track, layers, color, weight = 3, opacity = 0.7) {
+  const coords = track
+    .filter(p => p.lat != null)
+    .map(p => [p.lat, p.lng])
+  if (coords.length < 2) return
+  const line = L.polyline(coords, { color, weight, opacity, dashArray: '6 4' }).addTo(map)
+  layers.push(line)
+}
+
+export default function TrackMap({ fullTrack, selectedLap, referenceLap }) {
   const mapRef = useRef(null)
   const mapInstanceRef = useRef(null)
   const layersRef = useRef([])
@@ -39,29 +67,22 @@ export default function TrackMap({ fullTrack, selectedLap }) {
     layersRef.current.forEach(l => l.remove())
     layersRef.current = []
 
-    const track = selectedLap?.trackPoints ?? fullTrack
-    const speeds = track.map(p => p.speedKmh ?? 0)
-    const minSpeed = Math.min(...speeds)
-    const maxSpeed = Math.max(...speeds)
+    const comparing = !!(selectedLap && referenceLap)
+    const primaryTrack = selectedLap?.trackPoints ?? fullTrack
 
-    // Draw speed-colored segments
-    for (let i = 1; i < track.length; i++) {
-      const a = track[i - 1]
-      const b = track[i]
-      if (a.lat == null || b.lat == null) continue
+    if (comparing) {
+      // Reference lap: dashed blue, drawn first (below)
+      drawSolidTrack(mapInstanceRef.current, referenceLap.trackPoints, layersRef.current, '#4488ff', 3, 0.75)
 
-      const color = speedToColor(a.speedKmh ?? 0, minSpeed, maxSpeed)
-      const line = L.polyline(
-        [[a.lat, a.lng], [b.lat, b.lng]],
-        { color, weight: 4, opacity: 0.9 }
-      ).addTo(mapInstanceRef.current)
-
-      layersRef.current.push(line)
+      // Selected lap: speed-colored on top, slightly thinner so both are visible
+      drawSpeedTrack(mapInstanceRef.current, primaryTrack, layersRef.current, 3, 0.95)
+    } else {
+      drawSpeedTrack(mapInstanceRef.current, primaryTrack, layersRef.current, 4, 0.9)
     }
 
     // Mark start point
-    if (track.length > 0) {
-      const start = track[0]
+    if (primaryTrack.length > 0) {
+      const start = primaryTrack[0]
       const marker = L.circleMarker([start.lat, start.lng], {
         radius: 8,
         color: '#00e87a',
@@ -73,18 +94,29 @@ export default function TrackMap({ fullTrack, selectedLap }) {
     }
 
     // Fit map to track bounds
-    const bounds = L.latLngBounds(
-      track.filter(p => p.lat != null).map(p => [p.lat, p.lng])
-    )
+    const allPoints = [
+      ...primaryTrack,
+      ...(comparing ? referenceLap.trackPoints : []),
+    ].filter(p => p.lat != null)
+
+    const bounds = L.latLngBounds(allPoints.map(p => [p.lat, p.lng]))
     mapInstanceRef.current.fitBounds(bounds, { padding: [24, 24] })
-  }, [fullTrack, selectedLap])
+  }, [fullTrack, selectedLap, referenceLap])
+
+  const comparing = !!(selectedLap && referenceLap)
+
+  let title = selectedLap ? `L${selectedLap.lapNumber}` : 'Full track'
+  if (comparing) title = `L${selectedLap.lapNumber} vs L${referenceLap.lapNumber}`
 
   return (
     <div className="panel">
       <div className="panel-title">
-        Map — {selectedLap ? `L${selectedLap.lapNumber}` : 'Full track'}
+        Map — {title}
         <span style={{ marginLeft: 12, fontSize: 10, color: 'var(--text2)' }}>
-          🟢 slow → 🔴 fast
+          {comparing
+            ? <><span style={{ color: '#00e87a' }}>━</span> L{selectedLap.lapNumber} &nbsp;<span style={{ color: '#4488ff' }}>╌</span> L{referenceLap.lapNumber}</>
+            : '🟢 slow → 🔴 fast'
+          }
         </span>
       </div>
       <div className="map-wrapper" ref={mapRef} />
