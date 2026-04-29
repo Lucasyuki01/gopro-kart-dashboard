@@ -1,6 +1,6 @@
 import { exportPdf } from '../exportPdf'
 
-export default function SessionHeader({ session }) {
+export default function SessionHeader({ session, onBack }) {
   const { meta, summary } = session
   const date = meta.extractedAt
     ? new Date(meta.extractedAt).toLocaleDateString('en-US', {
@@ -10,7 +10,12 @@ export default function SessionHeader({ session }) {
 
   return (
     <div className="session-header">
-      <h1>Kart <span>Telemetry</span></h1>
+      <div className="header-left">
+        {onBack && (
+          <button className="back-btn" onClick={onBack}>← Back</button>
+        )}
+        <h1>Kart <span>Telemetry</span></h1>
+      </div>
       <div className="session-meta">
         <span>{meta.camera}</span>
         <span>•</span>

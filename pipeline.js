@@ -46,7 +46,9 @@ function step(title) {
 }
 
 function run(cmd, args) {
-  const result = spawnSync(cmd, args, { stdio: 'inherit', shell: true });
+  const result = spawnSync(cmd, args, { stdio: ['inherit', 'pipe', 'pipe'], shell: true });
+  if (result.stdout?.length) process.stdout.write(result.stdout)
+  if (result.stderr?.length) process.stderr.write(result.stderr)
   if (result.status !== 0) {
     log(`Error: command failed (exit ${result.status})`);
     process.exit(result.status ?? 1);

@@ -8,7 +8,7 @@ import StatsBar from './StatsBar'
 import LapTimesChart from './LapTimesChart'
 import '../styles/dashboard.css'
 
-export default function Dashboard() {
+export default function Dashboard({ onBack }) {
   const [session, setSession] = useState(null)
   const [selectedLap, setSelectedLap] = useState(null)
   const [referenceLap, setReferenceLap] = useState(null)
@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      <SessionHeader session={session} />
+      <SessionHeader session={session} onBack={onBack} />
       <StatsBar summary={session.summary} />
       <div className="dashboard-grid">
         <div className="col-left">

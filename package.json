@@ -9,6 +9,7 @@
     "pipeline": "node pipeline.js",
     "extract": "npm run extract --workspace=packages/extractor",
     "analyze": "npm run analyze --workspace=packages/analyzer",
-    "dashboard": "npm run dev --workspace=packages/dashboard"
+    "dashboard": "npm run dev --workspace=packages/dashboard",
+    "server": "npm run dev --workspace=packages/server"
   }
 }
