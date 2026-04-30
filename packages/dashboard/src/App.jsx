@@ -3,7 +3,9 @@ import ImportScreen from './components/ImportScreen'
 import Dashboard from './components/Dashboard'
 
 function App() {
-  const [screen, setScreen] = useState('import')
+  const [screen, setScreen] = useState(
+    import.meta.env.VITE_DEMO_MODE === 'true' ? 'dashboard' : 'import'
+  )
 
   if (screen === 'import') {
     return <ImportScreen onSessionReady={() => setScreen('dashboard')} />
