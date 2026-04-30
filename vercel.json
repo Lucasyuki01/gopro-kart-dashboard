@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build --workspace=packages/dashboard",
+  "buildCommand": "cd packages/dashboard && npm run build",
   "outputDirectory": "packages/dashboard/dist",
   "installCommand": "npm install"
 }
