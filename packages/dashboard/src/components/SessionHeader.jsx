@@ -1,4 +1,5 @@
 import { exportPdf } from '../exportPdf'
+import HelpModal from './HelpModal'
 
 export default function SessionHeader({ session, onBack }) {
   const { meta, summary } = session
@@ -25,9 +26,12 @@ export default function SessionHeader({ session, onBack }) {
         <span>•</span>
         <span>{summary.totalLaps} laps</span>
       </div>
-      <button className="export-btn" onClick={() => exportPdf(session)}>
-        Export PDF
-      </button>
+      <div className="header-actions">
+        <HelpModal />
+        <button className="export-btn" onClick={() => exportPdf(session)}>
+          Export PDF
+        </button>
+      </div>
     </div>
   )
 }
