@@ -6,6 +6,7 @@ import SpeedChart from './SpeedChart'
 import TrackMap from './TrackMap'
 import StatsBar from './StatsBar'
 import LapTimesChart from './LapTimesChart'
+import HelpModal from './HelpModal'
 import '../styles/dashboard.css'
 
 export default function Dashboard({ onBack }) {
@@ -49,6 +50,7 @@ export default function Dashboard({ onBack }) {
 
   return (
     <div className="dashboard">
+      <HelpModal />
       <SessionHeader session={session} onBack={onBack} />
       <StatsBar summary={session.summary} />
       <div className="dashboard-grid">
