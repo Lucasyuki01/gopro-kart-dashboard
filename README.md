@@ -1,103 +1,121 @@
-# GoPro Kart Dashboard
+# 🏎 GoPro Kart Dashboard
 
-A telemetry pipeline for go-kart sessions recorded with a GoPro Hero 10. Extracts GPS, accelerometer, and gyroscope data from onboard video files, analyzes it to detect laps and sector performance, and visualizes everything in an interactive React dashboard.
+A full telemetry pipeline for go-kart sessions recorded with a GoPro Hero 10. Extracts GPS, accelerometer, and gyroscope data from onboard video, analyzes lap performance, and visualizes everything in an interactive dashboard.
 
-## Pipeline Overview
+🔗 **[Live Demo → gopro-kart-dashboard-dashboard.vercel.app](https://gopro-kart-dashboard-dashboard.vercel.app)**
+
+---
+
+## 🎯 Why I built this
+
+After kart sessions, I had no way to objectively analyze what I was doing right or wrong. Using GoPro telemetry data, I built this pipeline to overlay my fastest and slowest laps on the same track map — comparing speed curves, braking points, and sector times side by side.
+
+The insight was immediate: I could see exactly where my fastest laps differed from the slow ones, understand what worked, and replicate it in the next session.
+
+---
+
+## 🧠 How it works
 
 ```
-GoPro MP4 files
-      │
-      ▼
-  [extractor]  →  output/*.telemetry.json
-      │
-      ▼
-  [analyzer]   →  output/*.session.json
-      │
-      ▼  (copy to packages/dashboard/public/session.json)
-  [dashboard]  →  browser UI
+GoPro MP4 files (with GPMF telemetry stream)
+          ↓
+    [Extractor]   →  GPS, accelerometer, gyroscope → telemetry.json
+          ↓
+    [Analyzer]    →  Lap detection, sector splits → session.json
+          ↓
+    [Dashboard]   →  Interactive React UI
 ```
 
-## Requirements
+**Extractor** — Reads the GPMF telemetry stream embedded in GoPro MP4 files. Supports merging multiple clips from the same session into one unified dataset.
 
-- Node.js 18+
-- GoPro Hero 10 footage (GPMF telemetry stream required)
+**Analyzer** — Detects lap boundaries using GPS coordinates around a configurable start/finish line. Splits each lap into sectors and computes time deltas, speed, and G-forces.
 
-## Usage
+**Dashboard** — React app with an interactive Leaflet map, speed comparison chart, and sector breakdown. Select any lap as reference and compare all others against it.
 
-### 1. Install dependencies
+---
+
+## ✨ Dashboard Features
+
+- **Lap table** — all detected laps with time, max/avg speed, and G-force; click to select, toggle as reference lap
+- **Track map** — Leaflet map with speed-colored overlay (green → red); shows full session or selected lap
+- **Speed chart** — lap speed curve vs. the reference lap
+- **Sector panel** — per-sector time deltas against the session's best sectors
+
+---
+
+## 🛠 Tech Stack
+
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat-square&logo=leaflet&logoColor=white)
+
+---
+
+## 🚀 How to Run
+
+**Requirements:** Node.js 18+ and GoPro Hero 10 footage with GPMF telemetry enabled.
 
 ```bash
+git clone https://github.com/Lucasyuki01/gopro-kart-dashboard.git
+cd gopro-kart-dashboard
 npm install
 ```
 
-### 2. Extract telemetry from video
-
-Place your MP4 files in the `input/` folder, then run:
+**Step 1 — Extract telemetry from video:**
 
 ```bash
 # Single file
 npm run extract -- --file input/GX010249.MP4
 
-# Multiple files (merged into one session)
-npm run extract -- --multi input/GX010249.MP4 input/GX020249.MP4 input/GX030249.MP4 --name my_session
+# Multiple clips merged into one session
+npm run extract -- --multi input/GX010249.MP4 input/GX020249.MP4 --name my_session
 ```
 
-Output: `output/my_session.telemetry.json`
-
-### 3. Analyze the session
+**Step 2 — Analyze the session:**
 
 ```bash
 npm run analyze -- --file output/my_session.telemetry.json --start-lat -30.1234 --start-lng -50.5678
 ```
 
-If `--start-lat`/`--start-lng` are omitted, the first GPS point is used as the start line.
-
-Output: `output/my_session.session.json`
-
-### 4. Load into the dashboard
+**Step 3 — Load into the dashboard:**
 
 ```bash
 cp output/my_session.session.json packages/dashboard/public/session.json
 npm run dashboard
+# Open http://localhost:5173
 ```
 
-Open `http://localhost:5173` in your browser.
+---
 
-## CLI Reference
+## ⚙️ CLI Reference
 
-### Extractor
+**Extractor**
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-f, --file <path>` | — | Single MP4 file |
-| `-m, --multi <paths...>` | — | Multiple MP4 files to merge |
-| `-o, --output <path>` | `./output` | Output directory |
-| `--name <name>` | — | Output filename (no extension) |
-| `--streams <list>` | `GPS5,ACCL,GYRO` | GPMF streams to extract |
-| `--smooth <n>` | `1` | GPS smoothing passes (0 = disabled) |
+| Flag | Description |
+|---|---|
+| `-f, --file` | Single MP4 file |
+| `-m, --multi` | Multiple MP4 files to merge |
+| `--name` | Output filename |
+| `--smooth` | GPS smoothing passes (default: 1) |
+| `--streams` | GPMF streams to extract (default: GPS5, ACCL, GYRO) |
 
-### Analyzer
+**Analyzer**
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-f, --file <path>` | — | Input `.telemetry.json` (required) |
-| `-o, --output <path>` | `./output` | Output directory |
-| `--start-lat <lat>` | auto | Start/finish line latitude |
-| `--start-lng <lng>` | auto | Start/finish line longitude |
-| `--start-radius <m>` | `15` | Detection radius around start line (meters) |
-| `--min-lap <s>` | `30` | Minimum valid lap time (seconds) |
-| `--sectors <n>` | `3` | Number of sectors per lap |
+| Flag | Description |
+|---|---|
+| `-f, --file` | Input `.telemetry.json` |
+| `--start-lat / --start-lng` | Start/finish line coordinates |
+| `--start-radius` | Detection radius in meters (default: 15m) |
+| `--min-lap` | Minimum valid lap time in seconds (default: 30s) |
+| `--sectors` | Number of sectors per lap (default: 3) |
 
-## Dashboard Features
+---
 
-- **Lap table** — all detected laps with time, max/avg speed, and G-force; click to select, toggle to set reference
-- **Track map** — Leaflet map with speed-colored track overlay (green → red); shows full session or selected lap
-- **Speed chart** — lap speed curve compared against the reference lap
-- **Sector panel** — per-sector breakdown with time deltas against the session's best sectors
-
-## Project Structure
+## 🗂 Project Structure
 
 ```
+gopro-kart-dashboard/
 ├── packages/
 │   ├── extractor/     # MP4 → telemetry.json (Node.js CLI)
 │   ├── analyzer/      # telemetry.json → session.json (Node.js CLI)
@@ -105,3 +123,10 @@ Open `http://localhost:5173` in your browser.
 ├── input/             # Source MP4 files (gitignored)
 └── output/            # Generated JSON files (gitignored)
 ```
+
+---
+
+## 👨‍💻 Author
+
+**Lucas Yuki Nishimoto**
+[github.com/Lucasyuki01](https://github.com/Lucasyuki01) · [lucasnishimoto.dev](https://lucasnishimoto.dev)
